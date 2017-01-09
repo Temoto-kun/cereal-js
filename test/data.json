@@ -1,0 +1,25 @@
+{
+  "id": "34579292528312405",
+  "email": "user@example.com",
+  "profile": {
+    "user": null,
+    "bio": "Hello world",
+    "dob": "1995-03-02",
+    "first_name": "Allan",
+    "last_name": "Crisostomo"
+  },
+  "posts": [
+    {
+      "id": "1",
+      "text": "Hello world.",
+      "date_published": "2014-08-31 18:00:00",
+      "author": null
+    },
+    {
+      "id": "2",
+      "text": "Hi Earth.",
+      "date_published": "2015-12-25 12:00:00",
+      "author": null
+    }
+  ]
+}

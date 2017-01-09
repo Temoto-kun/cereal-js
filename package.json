@@ -1,0 +1,36 @@
+{
+  "name": "@theoryofnekomata/oatmeal",
+  "version": "0.0.0",
+  "description": "De/serializes JavaScript models for use in REST APIs. Edit",
+  "main": "bin/oatmeal.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Temoto-kun/oatmeal.git"
+  },
+  "keywords": [
+    "serializer",
+    "data",
+    "REST",
+    "API",
+    "reflection",
+    "models"
+  ],
+  "author": "TheoryOfNekomata <allan.crisostomo@outlook.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Temoto-kun/oatmeal/issues"
+  },
+  "homepage": "https://github.com/Temoto-kun/oatmeal#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^2.0.0",
+    "jquery": "^3.1.1"
+  },
+  "dependencies": {
+    "moment": "^2.17.1"
+  }
+}
