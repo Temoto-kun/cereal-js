@@ -7,7 +7,7 @@ NPM:
 
     $ npm install --save Temoto-kun/oatmeal
     
-## Usage
+## Load
 
 ### Browser
 
@@ -44,6 +44,38 @@ define(['oatmeal'], function (oatmeal) {
 });
 ```
 
+## Usage
+
+```javascript
+var serializedData = oatmeal.serialize(rawDataFromRestApi, model);
+var deserializedData = oatmeal.deserialize(serializedData, model);
+```
+
+## Model Spec
+
+This is the general structure of a model definition object:
+
+```javascript
+var ModelName = {
+    "name": "ModelName",
+    "attributes": {
+        "attrName1": {
+            "_type": "string",
+            ...
+        },
+        "attrName2": {
+            "_type": "object",
+            "_model": AnotherModel,
+            ...
+        }
+    }
+}
+```
+
 ## License
 
 Apache-2.0. See LICENSE file for details.
+
+### TODO
+
+- [ ] Update documentation on model definition spec. 
