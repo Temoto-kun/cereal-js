@@ -537,13 +537,15 @@
                 .keys(model.attributes) // TODO sort attributes on which comes first
                 .forEach(function (attrName) {
                     var dataAttrName = attrName,
-                        type = model.attributes[attrName]._type;
+                        type = model.attributes[attrName]._type,
+                        getter = model.attributes[attrName]._get;
+
+                    if (typeof getter === 'function') {
+                        data[computedAttributePrefix + dataAttrName] = getter.call(data);
+                        return;
+                    }
 
                     model.attributes[attrName]._nullable = model.attributes[attrName]._nullable !== false;
-
-                    if (typeof model.attributes[attrName]._get === 'function') {
-                        dataAttrName = computedAttributePrefix + dataAttrName;
-                    }
 
                     switch (type) {
                         case 'array-collection':
@@ -552,11 +554,6 @@
                             });
                             break;
                         case 'object':
-                            getter = model.attributes[attrName]._get;
-                            if (typeof getter === 'function') {
-                                data[dataAttrName] = getter.call(data);
-                                break;
-                            }
                             data[dataAttrName] = serializeObject(data[attrName], model.attributes[attrName]._model);
                             break;
                         case 'parent':

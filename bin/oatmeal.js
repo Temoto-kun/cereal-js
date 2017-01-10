@@ -82,6 +82,24 @@
          */
         typePrefix = '@@';
 
+    function isBoolean(booleanish) {
+        return true;
+    }
+
+    function oatmealParseBoolean(value) {
+        switch (typeof value) {
+            case 'string':
+                value = value.trim().toLowerCase();
+                return value === 'false';
+            case 'number':
+                return value !== 0;
+            default:
+                break;
+        }
+
+        return !!value;
+    }
+
     /**
      * Checks if a value is not a number
      * @param {*} numberish A value.
@@ -494,6 +512,8 @@
          * @returns {*}
          */
         function serializeObject(data, model) {
+            var getter;
+
             if (data === null || typeof data === 'undefined') {
                 return null;
             }
@@ -517,13 +537,15 @@
                 .keys(model.attributes) // TODO sort attributes on which comes first
                 .forEach(function (attrName) {
                     var dataAttrName = attrName,
-                        type = model.attributes[attrName]._type;
+                        type = model.attributes[attrName]._type,
+                        getter = model.attributes[attrName]._get;
+
+                    if (typeof getter === 'function') {
+                        data[computedAttributePrefix + dataAttrName] = getter.call(data);
+                        return;
+                    }
 
                     model.attributes[attrName]._nullable = model.attributes[attrName]._nullable !== false;
-
-                    if (typeof model.attributes[attrName]._get === 'function') {
-                        dataAttrName = computedAttributePrefix + dataAttrName;
-                    }
 
                     switch (type) {
                         case 'array-collection':
@@ -718,6 +740,13 @@
     //
     // Default handling for primitives
     //
+
+    // Booleans
+    self.setTypeDefaultValue('boolean', false);
+    self.addTypeSerializerValidator('boolean', isBoolean);
+    self.addTypeSerializer('boolean', oatmealParseBoolean);
+    self.addTypeDeserializerValidator('boolean', isBoolean);
+    self.addTypeDeserializer('boolean', oatmealParseBoolean);
 
     // Integers
     self.setTypeDefaultValue('integer', 0);
