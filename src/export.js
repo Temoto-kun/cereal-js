@@ -82,6 +82,24 @@
          */
         typePrefix = '@@';
 
+    function isBoolean(booleanish) {
+        return true;
+    }
+
+    function oatmealParseBoolean(value) {
+        switch (typeof value) {
+            case 'string':
+                value = value.trim().toLowerCase();
+                return value === 'false';
+            case 'number':
+                return value !== 0;
+            default:
+                break;
+        }
+
+        return !!value;
+    }
+
     /**
      * Checks if a value is not a number
      * @param {*} numberish A value.
@@ -725,6 +743,13 @@
     //
     // Default handling for primitives
     //
+
+    // Booleans
+    self.setTypeDefaultValue('boolean', false);
+    self.addTypeSerializerValidator('boolean', isBoolean);
+    self.addTypeSerializer('boolean', oatmealParseBoolean);
+    self.addTypeDeserializerValidator('boolean', isBoolean);
+    self.addTypeDeserializer('boolean', oatmealParseBoolean);
 
     // Integers
     self.setTypeDefaultValue('integer', 0);
