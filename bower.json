@@ -1,0 +1,25 @@
+{
+  "name": "oatmeal",
+  "description": "De/serializes JavaScript models for use in REST APIs.",
+  "main": "bin/oatmeal.js",
+  "authors": [
+    "TheoryOfNekomata <allan.crisostomo@outlook.com>"
+  ],
+  "license": "Apache-2.0",
+  "keywords": [
+    "serializer",
+    "data",
+    "REST",
+    "API",
+    "reflection",
+    "models"
+  ],
+  "homepage": "https://github.com/Temoto-kun/oatmeal",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
