@@ -1,18 +1,33 @@
-(function (root, name, factory) {
+(function (root, name, dependencies, factory) {
+    var Oatmeal = function Oatmeal(deps) {
+        return (root[name] = factory.apply(null, deps));
+    };
+
     if (typeof define === 'function' && define.amd) {
-        define(['moment'], function (moment) {
-            return (root[name] = factory(moment));
+        define(dependencies, function (moment) {
+            return new Oatmeal(
+                Array.prototype.slice.call(arguments)
+            );
         });
         return;
     }
 
     if (typeof module === 'object' && module.exports) {
-        module.exports = root[name] = factory(require('moment'));
+        module.exports = new Oatmeal(
+            dependencies.map(function (depName) {
+                return require(depName);
+            })
+        );
         return;
     }
 
-    root[name] = factory(root.moment);
-})(this, 'Oatmeal', function (moment) {
+    root[name] = new Oatmeal(
+        dependencies.map(function (depName) {
+            return root[depName];
+        })
+    );
+
+})(this, 'Oatmeal', ['moment'], function Oatmeal(moment) {
     var
         /**
          * The Oatmeal instance.

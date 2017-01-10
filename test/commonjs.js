@@ -11,3 +11,5 @@ console.log("SERIALIZED");
 console.log(serialized = Oatmeal.serialize(data, User));
 console.log("DESERIALIZED");
 console.log(deserialized = Oatmeal.deserialize(serialized, User));
+console.log("COMPARISON");
+console.log(JSON.stringify(data), JSON.stringify(deserialized));

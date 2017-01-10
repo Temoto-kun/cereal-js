@@ -1,5 +1,5 @@
 (function () {
-    var Profile, Post, User, Tag, serialized, deserialized;
+    var Profile, Post, User, Tag, serialized, deserialized, dataJson, deserializedJson;
 
     function onLoaded(data) {
         Tag = {
@@ -95,6 +95,9 @@
         console.log(serialized = Oatmeal.serialize(data, User));
         console.log("DESERIALIZED");
         console.log(deserialized = Oatmeal.deserialize(serialized, User));
+        console.log("COMPARISON");
+        console.log(dataJson = JSON.stringify(data));
+        console.log(deserializedJson = JSON.stringify(deserialized));
     }
 
     $.getJSON('data.json', onLoaded);
