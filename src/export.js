@@ -494,6 +494,8 @@
          * @returns {*}
          */
         function serializeObject(data, model) {
+            var getter;
+
             if (data === null || typeof data === 'undefined') {
                 return null;
             }
@@ -532,6 +534,11 @@
                             });
                             break;
                         case 'object':
+                            getter = model.attributes[attrName]._get;
+                            if (typeof getter === 'function') {
+                                data[dataAttrName] = getter.call(data);
+                                break;
+                            }
                             data[dataAttrName] = serializeObject(data[attrName], model.attributes[attrName]._model);
                             break;
                         case 'parent':
