@@ -1,15 +1,13 @@
-var Oatmeal, data, model, serialized, deserialized;
+var Oatmeal, data, User, serialized, deserialized;
 
 Oatmeal = require('./../bin/oatmeal');
 data = require('./data.json');
 
-model = require('./models/User');
-serialized = Oatmeal.serialize(data, model);
-//deserialized = Oatmeal.deserialize(serialized, model);
+User = require('./models/User');
 
 console.log("DATA");
 console.log(data);
 console.log("SERIALIZED");
-console.log(serialized);
-//console.log("DESERIALIZED");
-//console.log(deserialized);
+console.log(serialized = Oatmeal.serialize(data, User));
+console.log("DESERIALIZED");
+console.log(deserialized = Oatmeal.deserialize(serialized, User));

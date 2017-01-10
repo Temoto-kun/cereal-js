@@ -1,7 +1,7 @@
 (function () {
     var Profile, Post, User, Tag, serialized, deserialized;
 
-    function onLoaded(response) {
+    function onLoaded(data) {
         Tag = {
             name: 'Tag',
             attributes: {
@@ -89,8 +89,12 @@
             }
         };
 
-        console.log(serialized = Oatmeal.serialize(response, User));
-        //console.log(deserialized = Oatmeal.deserialize(serialized, User));
+        console.log("DATA");
+        console.log(data);
+        console.log("SERIALIZED");
+        console.log(serialized = Oatmeal.serialize(data, User));
+        console.log("DESERIALIZED");
+        console.log(deserialized = Oatmeal.deserialize(serialized, User));
     }
 
     $.getJSON('data.json', onLoaded);

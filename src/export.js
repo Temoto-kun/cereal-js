@@ -201,7 +201,8 @@
                 // Save the source's descriptor
                 descriptor = Object.getOwnPropertyDescriptor(current.source, keys[propertyIndex]);
 
-                if (!descriptor.value || typeof descriptor.value !== 'object') {
+                if (!descriptor.value || typeof descriptor.value !== 'object' || descriptor.value instanceof Date) {
+                    // Added instanceof Date check
                     Object.defineProperty(current.target, keys[propertyIndex], descriptor);
                     continue;
                 }
@@ -424,6 +425,8 @@
                 return isNullable ? null : defaultValue;
             }
 
+            attachType(value, model.attributes[attrName]._type);
+
             return serializeValue(value, model, attrName);
         }
 
@@ -450,7 +453,7 @@
         }
 
         function determineModel(model) {
-            var loadedModel = typeof model === 'object' ? loadedModels[model.name] = model : loadedModels[model];
+            var loadedModel = (typeof model === 'object' ? loadedModels[model.name] = model : loadedModels[model]);
 
             if (!loadedModel) {
                 throw new Error('Model not yet defined: "' + model + '"');
@@ -475,16 +478,13 @@
                 return null;
             }
 
-            if (typeof model === 'string') {
-                model = { name: model };
-            }
+            model = determineModel(model);
 
             parents.push({
                 data: data,
                 model: model
             });
 
-            model = determineModel(model);
             storeData(data, model);
             attachType(data, model.name);
 
@@ -496,7 +496,8 @@
             Object
                 .keys(model.attributes) // TODO sort attributes on which comes first
                 .forEach(function (attrName) {
-                    var dataAttrName = attrName;
+                    var dataAttrName = attrName,
+                        type = model.attributes[attrName]._type;
 
                     model.attributes[attrName]._nullable = model.attributes[attrName]._nullable !== false;
 
@@ -504,7 +505,7 @@
                         dataAttrName = computedAttributePrefix + dataAttrName;
                     }
 
-                    switch (model.attributes[attrName]._type) {
+                    switch (type) {
                         case 'array-collection':
                             data[dataAttrName].forEach(function (datum, i) {
                                 data[dataAttrName][i] = serializeObject(datum, model.attributes[attrName]._model);
@@ -536,6 +537,8 @@
      * @returns {*} The deserialized data.
      */
     self.deserialize = function deserialize(data, model) {
+        var loadedModels = {};
+
         data = clone(data);
 
         /**
@@ -623,6 +626,16 @@
             return data[attrName] = { id: data[attrName].id };
         }
 
+        function determineModel(model) {
+            var loadedModel = (typeof model === 'object' ? loadedModels[model.name] = model : loadedModels[model]);
+
+            if (!loadedModel) {
+                throw new Error('Model not yet defined: "' + model + '"');
+            }
+
+            return loadedModel;
+        }
+
         /**
          *
          * @param data
@@ -635,6 +648,7 @@
             }
 
             detachType(data);
+            model = determineModel(model);
 
             if (!model.attributes) {
                 return data;
@@ -644,17 +658,20 @@
                 .keys(data)
                 .sort() // TODO fix sort so that some attributes have priority
                 .forEach(function (attrName) {
-                    var dataAttrName = attrName;
+                    var dataAttrName = attrName,
+                        type;
 
                     if (!model.attributes[attrName]) {
                         return;
                     }
 
+                    type = model.attributes[attrName]._type;
+
                     if (typeof model.attributes[attrName]._get === 'function') {
                         dataAttrName = computedAttributePrefix + dataAttrName;
                     }
 
-                    switch (model.attributes[attrName]._type) {
+                    switch (type) {
                         case 'array-collection':
                             data[dataAttrName].forEach(function (datum, i) {
                                 data[dataAttrName][i] = deserializeObject(datum, model.attributes[attrName]._model);
