@@ -21,12 +21,11 @@
         return;
     }
 
-    root[name] = new Oatmeal(
+    return new Oatmeal(
         dependencies.map(function (depName) {
             return root[depName];
         })
     );
-
 })(this, 'Oatmeal', ['moment'], function Oatmeal(moment) {
     var
         /**
