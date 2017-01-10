@@ -248,10 +248,16 @@
     }
 
     function attachType(obj, type) {
+        if (!obj) {
+            return;
+        }
         obj[typePrefix + 'type'] = type;
     }
 
     function detachType(obj) {
+        if (!obj) {
+            return;
+        }
         delete obj[typePrefix + 'type'];
     }
 
