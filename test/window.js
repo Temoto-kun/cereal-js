@@ -1,7 +1,20 @@
 (function () {
-    var Profile, Post, User, serialized, deserialized;
+    var Profile, Post, User, Tag, serialized, deserialized;
 
     function onLoaded(response) {
+        Tag = {
+            name: 'Tag',
+            attributes: {
+                label: {
+                    _type: 'string'
+                },
+                created_by: {
+                    _type: 'object',
+                    _model: 'User'
+                }
+            }
+        };
+
         Profile = {
             name: 'Profile',
             attributes: {
@@ -51,6 +64,10 @@
                 author: {
                     _type: 'parent',
                     _model: 'User'
+                },
+                tags: {
+                    _type: 'array-collection',
+                    _model: Tag
                 }
             }
         };
@@ -73,7 +90,7 @@
         };
 
         console.log(serialized = Oatmeal.serialize(response, User));
-        console.log(deserialized = Oatmeal.deserialize(serialized, User));
+        //console.log(deserialized = Oatmeal.deserialize(serialized, User));
     }
 
     $.getJSON('data.json', onLoaded);

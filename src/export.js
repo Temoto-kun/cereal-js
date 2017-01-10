@@ -1,17 +1,17 @@
 (function (root, name, factory) {
     if (typeof define === 'function' && define.amd) {
-        define([ 'moment' ], function (moment) {
-            return (root[ name ] = factory(moment));
+        define(['moment'], function (moment) {
+            return (root[name] = factory(moment));
         });
         return;
     }
 
     if (typeof module === 'object' && module.exports) {
-        module.exports = root[ name ] = factory(require('moment'));
+        module.exports = root[name] = factory(require('moment'));
         return;
     }
 
-    root[ name ] = factory(root.moment);
+    root[name] = factory(root.moment);
 })(this, 'Oatmeal', function (moment) {
     var
         /**
@@ -169,7 +169,7 @@
     function emailValidator(value) {
         return typeof value === 'string' && (
                 value.trim().length < 1 ||
-                // http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+                    // http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
                 value.search(/(?:(?:\r\n)?[ \t])*(?:(?:(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*\<(?:(?:\r\n)?[ \t])*(?:@(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*(?:,@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*)*:(?:(?:\r\n)?[ \t])*)?(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*\>(?:(?:\r\n)?[ \t])*)|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*:(?:(?:\r\n)?[ \t])*(?:(?:(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*\<(?:(?:\r\n)?[ \t])*(?:@(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*(?:,@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*)*:(?:(?:\r\n)?[ \t])*)?(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*\>(?:(?:\r\n)?[ \t])*)(?:,\s*(?:(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*\<(?:(?:\r\n)?[ \t])*(?:@(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*(?:,@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*)*:(?:(?:\r\n)?[ \t])*)?(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*\>(?:(?:\r\n)?[ \t])*))*)?;\s*)/i) === 0
             );
     }
@@ -185,13 +185,13 @@
             current,
             nextSource,
             indexOf,
-            copies = [ {
+            copies = [{
                 source: originalObject,
                 target: Object.create(Object.getPrototypeOf(originalObject))
-            } ],
-            cloneObject = copies[ 0 ].target,
-            sourceReferences = [ originalObject ],
-            targetReferences = [ cloneObject ];
+            }],
+            cloneObject = copies[0].target,
+            sourceReferences = [originalObject],
+            targetReferences = [cloneObject];
 
         // First in, first out
         while (current = copies.shift()) {
@@ -199,10 +199,10 @@
 
             for (propertyIndex = 0; propertyIndex < keys.length; propertyIndex++) {
                 // Save the source's descriptor
-                descriptor = Object.getOwnPropertyDescriptor(current.source, keys[ propertyIndex ]);
+                descriptor = Object.getOwnPropertyDescriptor(current.source, keys[propertyIndex]);
 
                 if (!descriptor.value || typeof descriptor.value !== 'object') {
-                    Object.defineProperty(current.target, keys[ propertyIndex ], descriptor);
+                    Object.defineProperty(current.target, keys[propertyIndex], descriptor);
                     continue;
                 }
 
@@ -215,15 +215,15 @@
 
                 if (indexOf !== -1) {
                     // The source is already referenced, just assign reference
-                    descriptor.value = targetReferences[ indexOf ];
-                    Object.defineProperty(current.target, keys[ propertyIndex ], descriptor);
+                    descriptor.value = targetReferences[indexOf];
+                    Object.defineProperty(current.target, keys[propertyIndex], descriptor);
                     continue;
                 }
 
                 sourceReferences.push(nextSource);
                 targetReferences.push(descriptor.value);
 
-                Object.defineProperty(current.target, keys[ propertyIndex ], descriptor);
+                Object.defineProperty(current.target, keys[propertyIndex], descriptor);
 
                 copies.push({ source: nextSource, target: descriptor.value });
             }
@@ -248,8 +248,8 @@
      */
     self.instantiateValue = function instantiateValue(data, type) {
         if (typeof type === 'string') {
-            return typeof constructors[ type ] === 'function' ?
-                new constructors[ type ](data) : data;
+            return typeof constructors[type] === 'function' ?
+                new constructors[type](data) : data;
         }
 
         return {};
@@ -261,7 +261,7 @@
      * @param {*} value The default value for the type.
      */
     self.setTypeDefaultValue = function setTypeDefaultValue(type, value) {
-        defaultValues[ type ] = value;
+        defaultValues[type] = value;
     };
 
     /**
@@ -274,7 +274,7 @@
             throw new Error('Unknown constructor function for type "' + type + '"');
         }
 
-        constructors[ type ] = ctorFn;
+        constructors[type] = ctorFn;
     };
 
     /**
@@ -283,13 +283,13 @@
      * @param {Function} serializeFn The serializer function.
      */
     self.addTypeSerializer = function addTypeSerializer(type, serializeFn) {
-        serializers[ type ] = serializers[ type ] || [];
+        serializers[type] = serializers[type] || [];
 
         if (typeof serializeFn !== 'function') {
             throw new Error('Unknown serialize function for type "' + type + '"');
         }
 
-        serializers[ type ].push(serializeFn);
+        serializers[type].push(serializeFn);
     };
 
     /**
@@ -298,13 +298,13 @@
      * @param {Function} deserializeFn The deserializer function.
      */
     self.addTypeDeserializer = function addTypeDeserializer(type, deserializeFn) {
-        deserializers[ type ] = deserializers[ type ] || [];
+        deserializers[type] = deserializers[type] || [];
 
         if (typeof deserializeFn !== 'function') {
             throw new Error('Unknown deserialize function for type "' + type + '"');
         }
 
-        deserializers[ type ].push(deserializeFn);
+        deserializers[type].push(deserializeFn);
     };
 
     /**
@@ -313,13 +313,13 @@
      * @param {Function} validateFn The validator function.
      */
     self.addTypeSerializerValidator = function addTypeSerializerValidator(type, validateFn) {
-        serializerValidators[ type ] = serializerValidators[ type ] || [];
+        serializerValidators[type] = serializerValidators[type] || [];
 
         if (typeof validateFn !== 'function') {
             throw new Error('Unknown serializer validate function for type "' + type + '"');
         }
 
-        serializerValidators[ type ].push(validateFn);
+        serializerValidators[type].push(validateFn);
     };
 
     /**
@@ -328,13 +328,13 @@
      * @param {Function} validateFn The validator function.
      */
     self.addTypeDeserializerValidator = function addTypeSerializerValidator(type, validateFn) {
-        deserializerValidators[ type ] = deserializerValidators[ type ] || [];
+        deserializerValidators[type] = deserializerValidators[type] || [];
 
         if (typeof validateFn !== 'function') {
             throw new Error('Unknown deserializer validate function for type "' + type + '"');
         }
 
-        deserializerValidators[ type ].push(validateFn);
+        deserializerValidators[type].push(validateFn);
     };
 
     /**
@@ -345,6 +345,8 @@
      */
     self.serialize = function serialize(data, model) {
         var parents = [];
+        var loadedData = {};
+        var loadedModels = {};
 
         data = clone(data);
 
@@ -356,18 +358,18 @@
          * @returns {*}
          */
         function validate(value, model, attrName) {
-            var type = model.attributes[ attrName ]._type;
+            var type = model.attributes[attrName]._type;
 
-            if (!(serializerValidators[ type ] instanceof Array)) {
+            if (!(serializerValidators[type] instanceof Array)) {
                 return true;
             }
 
-            return serializerValidators[ type ]
+            return serializerValidators[type]
                     .reduce(function (isValid, validateFn) {
                         if (typeof validateFn !== 'function') {
                             throw new Error('Invalid validator function for type "' + type + '".');
                         }
-                        return isValid && validateFn(value, model.attributes[ attrName ]);
+                        return isValid && validateFn(value, model.attributes[attrName]);
                     }, true) || value === null;
         }
 
@@ -379,20 +381,20 @@
          * @returns {{}|*}
          */
         function serializeValue(value, model, attrName) {
-            var type = model.attributes[ attrName ]._type;
+            var type = model.attributes[attrName]._type;
 
             value = self.instantiateValue(value, type);
 
-            if (!(serializers[ type ] instanceof Array)) {
+            if (!(serializers[type] instanceof Array)) {
                 return value;
             }
 
-            serializers[ type ]
+            serializers[type]
                 .forEach(function (serializerFn) {
                     if (typeof serializerFn !== 'function') {
                         throw new Error('Invalid serializer function for type "' + type + '".');
                     }
-                    value = serializerFn(value, model.attributes[ attrName ]);
+                    value = serializerFn(value, model.attributes[attrName]);
                 });
 
             //attachType(value, model.attributes[attrName]._type);
@@ -409,13 +411,13 @@
         function serializeNonObject(data, attrName, model) {
             var isNullable, defaultValue, value, getter;
 
-            isNullable = model.attributes[ attrName ]._nullable !== false;
-            defaultValue = model.attributes[ attrName ]._default;
-            getter = model.attributes[ attrName ]._get;
-            value = typeof getter === 'function' ? getter.call(data) : data[ attrName ];
+            isNullable = model.attributes[attrName]._nullable !== false;
+            defaultValue = model.attributes[attrName]._default;
+            getter = model.attributes[attrName]._get;
+            value = typeof getter === 'function' ? getter.call(data) : data[attrName];
 
             if (!validate(defaultValue, model, attrName) || defaultValue === null) {
-                defaultValue = isNullable ? null : defaultValues[ model.attributes[ attrName ]._type ];
+                defaultValue = isNullable ? null : defaultValues[model.attributes[attrName]._type];
             }
 
             if (!validate(value, model, attrName) || value === null) {
@@ -435,15 +437,31 @@
         function serializeParent(data, attrName, parentModelName) {
             var theParent = null;
 
-            parents.forEach(function (parent) {
-                if (theParent !== null || parent.model.name !== parentModelName) {
+            parents.forEach(function (parent, i) {
+                var p = parents[parents.length - 1 - i];
+                if (theParent !== null || p.model.name !== parentModelName) {
                     return;
                 }
 
-                theParent = parent.data;
+                theParent = p.data;
             });
 
-            return data[ attrName ] = theParent;
+            return data[attrName] = theParent;
+        }
+
+        function determineModel(model) {
+            var loadedModel = typeof model === 'object' ? loadedModels[model.name] = model : loadedModels[model];
+
+            if (!loadedModel) {
+                throw new Error('Model not yet defined: "' + model + '"');
+            }
+
+            return loadedModel;
+        }
+
+        function storeData(data, model) {
+            loadedData[model.name] = loadedData[model.name] || {};
+            loadedData[model.name][data.id] = data;
         }
 
         /**
@@ -457,11 +475,17 @@
                 return null;
             }
 
-            parents.unshift({
+            if (typeof model === 'string') {
+                model = { name: model };
+            }
+
+            parents.push({
                 data: data,
                 model: model
             });
 
+            model = determineModel(model);
+            storeData(data, model);
             attachType(data, model.name);
 
             if (!model.attributes) {
@@ -474,30 +498,31 @@
                 .forEach(function (attrName) {
                     var dataAttrName = attrName;
 
-                    model.attributes[ attrName ]._nullable = model.attributes[ attrName ]._nullable !== false;
+                    model.attributes[attrName]._nullable = model.attributes[attrName]._nullable !== false;
 
-                    if (typeof model.attributes[ attrName ]._get === 'function') {
+                    if (typeof model.attributes[attrName]._get === 'function') {
                         dataAttrName = computedAttributePrefix + dataAttrName;
                     }
 
-                    switch (model.attributes[ attrName ]._type) {
+                    switch (model.attributes[attrName]._type) {
                         case 'array-collection':
-                            data[ dataAttrName ].forEach(function (datum, i) {
-                                data[ dataAttrName ][ i ] = serializeObject(datum, model.attributes[ attrName ]._model);
+                            data[dataAttrName].forEach(function (datum, i) {
+                                data[dataAttrName][i] = serializeObject(datum, model.attributes[attrName]._model);
                             });
                             break;
                         case 'object':
-                            data[ dataAttrName ] = serializeObject(data[ attrName ], model.attributes[ attrName ]._model);
+                            data[dataAttrName] = serializeObject(data[attrName], model.attributes[attrName]._model);
                             break;
                         case 'parent':
-                            data[ dataAttrName ] = serializeParent(data, attrName, model.attributes[ attrName ]._model);
+                            data[dataAttrName] = serializeParent(data, attrName, model.attributes[attrName]._model);
                             break;
                         default:
-                            data[ dataAttrName ] = serializeNonObject(data, attrName, model);
+                            data[dataAttrName] = serializeNonObject(data, attrName, model);
                             break;
                     }
                 });
 
+            parents.pop();
             return data;
         }
 
@@ -521,18 +546,18 @@
          * @returns {*}
          */
         function validate(value, model, attrName) {
-            var type = model.attributes[ attrName ]._type;
+            var type = model.attributes[attrName]._type;
 
-            if (!(serializerValidators[ type ] instanceof Array)) {
+            if (!(serializerValidators[type] instanceof Array)) {
                 return true;
             }
 
-            return serializerValidators[ type ]
+            return serializerValidators[type]
                     .reduce(function (isValid, validateFn) {
                         if (typeof validateFn !== 'function') {
                             throw new Error('Invalid validator function for type "' + type + '".');
                         }
-                        return isValid && validateFn(value, model.attributes[ attrName ]);
+                        return isValid && validateFn(value, model.attributes[attrName]);
                     }, true) || value === null;
         }
 
@@ -544,18 +569,18 @@
          * @returns {*}
          */
         function deserializeValue(value, model, attrName) {
-            var type = model.attributes[ attrName ]._type;
+            var type = model.attributes[attrName]._type;
 
-            if (!(deserializers[ type ] instanceof Array)) {
+            if (!(deserializers[type] instanceof Array)) {
                 return value;
             }
 
-            deserializers[ type ]
+            deserializers[type]
                 .forEach(function (deserializerFn) {
                     if (typeof deserializerFn !== 'function') {
                         throw new Error('Invalid deserializer function for type "' + type + '".');
                     }
-                    value = deserializerFn(value, model.attributes[ attrName ]);
+                    value = deserializerFn(value, model.attributes[attrName]);
                 });
 
             detachType(value);
@@ -572,13 +597,13 @@
         function deserializeNonObject(data, attrName, model) {
             var isNullable, defaultValue, value, getter;
 
-            isNullable = model.attributes[ attrName ]._nullable !== false;
-            defaultValue = model.attributes[ attrName ]._default;
-            getter = model.attributes[ attrName ]._get;
-            value = typeof getter === 'function' ? getter.call(data) : data[ attrName ];
+            isNullable = model.attributes[attrName]._nullable !== false;
+            defaultValue = model.attributes[attrName]._default;
+            getter = model.attributes[attrName]._get;
+            value = typeof getter === 'function' ? getter.call(data) : data[attrName];
 
             if (!validate(defaultValue, model, attrName) || defaultValue === null) {
-                defaultValue = isNullable ? null : defaultValues[ model.attributes[ attrName ]._type ];
+                defaultValue = isNullable ? null : defaultValues[model.attributes[attrName]._type];
             }
 
             if (!validate(value, model, attrName) || value === null) {
@@ -595,7 +620,7 @@
          * @returns {{id: *}}
          */
         function deserializeParent(data, attrName) {
-            return data[ attrName ] = { id: data[ attrName ].id };
+            return data[attrName] = { id: data[attrName].id };
         }
 
         /**
@@ -621,28 +646,28 @@
                 .forEach(function (attrName) {
                     var dataAttrName = attrName;
 
-                    if (!model.attributes[ attrName ]) {
+                    if (!model.attributes[attrName]) {
                         return;
                     }
 
-                    if (typeof model.attributes[ attrName ]._get === 'function') {
+                    if (typeof model.attributes[attrName]._get === 'function') {
                         dataAttrName = computedAttributePrefix + dataAttrName;
                     }
 
-                    switch (model.attributes[ attrName ]._type) {
+                    switch (model.attributes[attrName]._type) {
                         case 'array-collection':
-                            data[ dataAttrName ].forEach(function (datum, i) {
-                                data[ dataAttrName ][ i ] = deserializeObject(datum, model.attributes[ attrName ]._model);
+                            data[dataAttrName].forEach(function (datum, i) {
+                                data[dataAttrName][i] = deserializeObject(datum, model.attributes[attrName]._model);
                             });
                             break;
                         case 'object':
-                            data[ dataAttrName ] = deserializeObject(data[ attrName ], model.attributes[ attrName ]._model);
+                            data[dataAttrName] = deserializeObject(data[attrName], model.attributes[attrName]._model);
                             break;
                         case 'parent':
-                            data[ dataAttrName ] = deserializeParent(data, attrName);
+                            data[dataAttrName] = deserializeParent(data, attrName);
                             break;
                         default:
-                            data[ dataAttrName ] = deserializeNonObject(data, attrName, model);
+                            data[dataAttrName] = deserializeNonObject(data, attrName, model);
                             break;
                     }
                 });

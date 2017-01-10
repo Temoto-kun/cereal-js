@@ -2,6 +2,7 @@
   "id": "34579292528312405",
   "email": "user@example.com",
   "profile": {
+    "id": "34579292528312405",
     "user": null,
     "bio": "Hello world",
     "dob": "1995-03-02",
@@ -13,13 +14,51 @@
       "id": "1",
       "text": "Hello world.",
       "date_published": "2014-08-31 18:00:00",
-      "author": null
+      "author": null,
+      "tags": [
+        {
+          "id": "1",
+          "label": "test",
+          "created_by": {
+            "id": "2",
+            "email": "john.doe420@mailinator.com",
+            "profile": {
+              "id": "2",
+              "user": null,
+              "bio": "I exist!",
+              "dob": "1995-05-29",
+              "first_name": "John",
+              "last_name": "Doe"
+            },
+            "posts": []
+          }
+        }
+      ]
     },
     {
       "id": "2",
       "text": "Hi Earth.",
       "date_published": "2015-12-25 12:00:00",
-      "author": null
+      "author": null,
+      "tags": [
+        {
+          "id": "2",
+          "label": "post",
+          "created_by": {
+            "id": "3",
+            "email": "tarou.yamada@example.com",
+            "profile": {
+              "id": "3",
+              "user": null,
+              "bio": "Doumo arigatou, Mr. Roboto!",
+              "dob": "1969-06-09",
+              "first_name": "Yamada",
+              "last_name": "Tarou"
+            },
+            "posts": []
+          }
+        }
+      ]
     }
   ]
 }

@@ -11,6 +11,10 @@ module.exports = {
         author: {
             _type: 'parent',
             _model: 'User'
+        },
+        tags: {
+            _type: 'array-collection',
+            _model: require('./Tag')
         }
     }
 };
