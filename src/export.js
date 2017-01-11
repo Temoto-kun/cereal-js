@@ -292,6 +292,10 @@
     self.instantiateValue = function instantiateValue(type, data) {
         var newValue;
 
+        if (typeof type === 'object' && typeof data === 'undefined') {
+            data = {};
+        }
+
         if (isPrimitive(data) || typeof defaultValues[type] !== 'undefined' && isPrimitive(defaultValues[type])) {
             return data;
         }
@@ -554,6 +558,9 @@
 
                     switch (type) {
                         case 'array-collection':
+                            if (!(data[dataAttrName] instanceof Array)) {
+                                data[dataAttrName] = [];
+                            }
                             data[dataAttrName].forEach(function (datum, i) {
                                 data[dataAttrName][i] = serializeObject(datum, model.attributes[attrName]._model);
                             });
@@ -725,11 +732,17 @@
 
                     switch (type) {
                         case 'array-collection':
+                            if (!(data[dataAttrName] instanceof Array)) {
+                                data[dataAttrName] = [];
+                            }
                             data[dataAttrName].forEach(function (datum, i) {
                                 data[dataAttrName][i] = deserializeObject(datum, model.attributes[attrName]._model);
                             });
                             break;
                         case 'object':
+                            if (typeof data[dataAttrName] !== 'object') {
+                                data[dataAttrName] = null;
+                            }
                             data[dataAttrName] = deserializeObject(data[attrName], model.attributes[attrName]._model);
                             break;
                         case 'parent':
