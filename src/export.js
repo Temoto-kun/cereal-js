@@ -286,12 +286,22 @@
      * @returns {*} The instantiated value.
      */
     self.instantiateValue = function instantiateValue(data, type) {
-        if (typeof type === 'string') {
-            return typeof constructors[type] === 'function' ?
-                new constructors[type](data) : data;
+        var newValue;
+
+        data = clone(data);
+
+        if (typeof type !== 'string') {
+            newValue = data;
+
+            if (typeof newValue.id === 'undefined') {
+                newValue.id = null;
+            }
+
+            return newValue;
         }
 
-        return {};
+        return (typeof constructors[type] === 'function' ?
+            new constructors[type](data) : data);
     };
 
     /**
