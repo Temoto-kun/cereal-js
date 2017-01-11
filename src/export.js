@@ -100,6 +100,10 @@
         return !!value;
     }
 
+    function isPrimitive(data) {
+        return typeof data !== 'object' || data instanceof Date;
+    }
+
     /**
      * Checks if a value is not a number
      * @param {*} numberish A value.
@@ -142,7 +146,7 @@
      * @returns {string} The string value.
      */
     function stringSerializer(stringish) {
-        return stringish.toString();
+        return typeof stringish === 'string' || stringish instanceof String ? stringish : stringish.toString();
     }
 
     /**
@@ -281,27 +285,21 @@
 
     /**
      * Instantiates a value from the given model
-     * @param {Object} data The data to merge with the instantiated value.
      * @param {String} type The type of the instantiated value.
+     * @param {String|Object} data The data to merge with the instantiated value.
      * @returns {*} The instantiated value.
      */
-    self.instantiateValue = function instantiateValue(data, type) {
+    self.instantiateValue = function instantiateValue(type, data) {
         var newValue;
 
-        data = clone(data);
-
-        if (typeof type !== 'string') {
-            newValue = data;
-
-            if (typeof newValue.id === 'undefined') {
-                newValue.id = null;
-            }
-
-            return newValue;
+        if (typeof data !== 'object' && data instanceof Date) {
+            return data;
         }
 
-        return (typeof constructors[type] === 'function' ?
-            new constructors[type](data) : data);
+        newValue = typeof constructors[type] === 'function' ? new constructors[type](data) : clone(data);
+        newValue.id = typeof newValue.id === 'undefined' ? null : newValue.id;
+
+        return newValue;
     };
 
     /**
@@ -397,7 +395,9 @@
         var loadedData = {};
         var loadedModels = {};
 
-        data = clone(data);
+        if (!isPrimitive(data)) {
+            data = clone(data);
+        }
 
         /**
          *
@@ -427,12 +427,12 @@
          * @param value
          * @param model
          * @param attrName
-         * @returns {{}|*}
+         * @returns {*}
          */
         function serializeValue(value, model, attrName) {
             var type = model.attributes[attrName]._type;
 
-            value = self.instantiateValue(value, type);
+            value = self.instantiateValue(type, value);
 
             if (!(serializers[type] instanceof Array)) {
                 return value;
@@ -458,12 +458,11 @@
          * @returns {*}
          */
         function serializeNonObject(data, attrName, model) {
-            var isNullable, defaultValue, value, getter;
+            var isNullable, defaultValue, value;
 
             isNullable = model.attributes[attrName]._nullable !== false;
             defaultValue = model.attributes[attrName]._default;
-            getter = model.attributes[attrName]._get;
-            value = typeof getter === 'function' ? getter.call(data) : data[attrName];
+            value = data[attrName];
 
             if (!validate(defaultValue, model, attrName) || defaultValue === null) {
                 defaultValue = isNullable ? null : defaultValues[model.attributes[attrName]._type];
@@ -522,8 +521,6 @@
          * @returns {*}
          */
         function serializeObject(data, model) {
-            var getter;
-
             if (data === null || typeof data === 'undefined') {
                 return null;
             }
@@ -591,7 +588,9 @@
     self.deserialize = function deserialize(data, model) {
         var loadedModels = {};
 
-        data = clone(data);
+        if (!isPrimitive(data)) {
+            data = clone(data);
+        }
 
         /**
          *
@@ -711,16 +710,19 @@
                 .sort() // TODO fix sort so that some attributes have priority
                 .forEach(function (attrName) {
                     var dataAttrName = attrName,
-                        type;
+                        type,
+                        setter;
 
                     if (!model.attributes[attrName]) {
                         return;
                     }
 
                     type = model.attributes[attrName]._type;
+                    setter = model.attributes[attrName]._set;
 
-                    if (typeof model.attributes[attrName]._get === 'function') {
-                        dataAttrName = computedAttributePrefix + dataAttrName;
+                    if (typeof setter === 'function') {
+                        setter.call(model);
+                        return;
                     }
 
                     switch (type) {
