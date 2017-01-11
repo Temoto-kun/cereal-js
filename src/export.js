@@ -292,7 +292,7 @@
     self.instantiateValue = function instantiateValue(type, data) {
         var newValue;
 
-        if (typeof data !== 'object' && data instanceof Date) {
+        if (isPrimitive(data) || typeof defaultValues[type] !== 'undefined' && isPrimitive(defaultValues[type])) {
             return data;
         }
 
@@ -446,7 +446,7 @@
                     value = serializerFn(value, model.attributes[attrName]);
                 });
 
-            //attachType(value, model.attributes[attrName]._type);
+            attachType(value, model.attributes[attrName]._type);
             return value;
         }
 
@@ -471,8 +471,6 @@
             if (!validate(value, model, attrName) || value === null) {
                 return isNullable ? null : defaultValue;
             }
-
-            attachType(value, model.attributes[attrName]._type);
 
             return serializeValue(value, model, attrName);
         }
