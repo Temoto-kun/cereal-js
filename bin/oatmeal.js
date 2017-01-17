@@ -292,6 +292,10 @@
     self.instantiateValue = function instantiateValue(type, data) {
         var newValue;
 
+        if (typeof type === 'object' && typeof data === 'undefined') {
+            data = {};
+        }
+
         if (isPrimitive(data) || typeof defaultValues[type] !== 'undefined' && isPrimitive(defaultValues[type])) {
             return data;
         }
@@ -554,6 +558,27 @@
 
                     switch (type) {
                         case 'array-collection':
+                            if (typeof data[attrName] === 'undefined' || !(data[attrName] instanceof Array)) {
+                                data[dataAttrName] = [];
+                            }
+                            break;
+                        case 'object':
+                            if (isPrimitive(data[attrName])) {
+                                data[dataAttrName] = [];
+                            }
+                            break;
+                        case 'parent':
+                            data[dataAttrName] = null;
+                            break;
+                        default:
+                            if (!isPrimitive(data[attrName])) {
+                                data[dataAttrName] = defaultValues[model.attributes[attrName]._type];
+                            }
+                            break;
+                    }
+
+                    switch (type) {
+                        case 'array-collection':
                             data[dataAttrName].forEach(function (datum, i) {
                                 data[dataAttrName][i] = serializeObject(datum, model.attributes[attrName]._model);
                             });
@@ -672,7 +697,7 @@
          * @returns {{id: *}}
          */
         function deserializeParent(data, attrName) {
-            return data[attrName] = { id: data[attrName].id };
+            return data[attrName] === null ? null : data[attrName] = { id: data[attrName].id };
         }
 
         function determineModel(model) {
@@ -718,9 +743,30 @@
                     type = model.attributes[attrName]._type;
                     setter = model.attributes[attrName]._set;
 
-                    if (typeof setter === 'function') {
+                    if (typeof setter === 'function' && typeof data[computedAttributePrefix + dataAttrName] !== 'undefined') {
                         setter.call(model);
                         return;
+                    }
+
+                    switch (type) {
+                        case 'array-collection':
+                            if (!(data[dataAttrName] instanceof Array)) {
+                                data[dataAttrName] = [];
+                            }
+                            break;
+                        case 'object':
+                            if (typeof data[dataAttrName] !== 'object') {
+                                data[dataAttrName] = null;
+                            }
+                            break;
+                        case 'parent':
+                            data[dataAttrName] = null;
+                            break;
+                        default:
+                            if (typeof data[dataAttrName] !== 'undefined') {
+                                data[dataAttrName] = defaultValues[model.attributes[attrName]._type];
+                            }
+                            break;
                     }
 
                     switch (type) {
@@ -730,7 +776,7 @@
                             });
                             break;
                         case 'object':
-                            data[dataAttrName] = deserializeObject(data[attrName], model.attributes[attrName]._model);
+                            data[dataAttrName] = deserializeObject(data[dataAttrName], model.attributes[attrName]._model);
                             break;
                         case 'parent':
                             data[dataAttrName] = deserializeParent(data, attrName);
