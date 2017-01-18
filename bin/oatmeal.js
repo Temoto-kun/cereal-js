@@ -931,6 +931,29 @@
                 return data;
             }
 
+            function setToDefaultValues(data, model, attrName) {
+                var type = model.attributes[attrName]._type;
+
+                switch (type) {
+                    case 'array-collection':
+                        if (!(data[attrName] instanceof Array)) {
+                            data[attrName] = [];
+                        }
+                        break;
+                    case 'object':
+                    case 'parent':
+                        if (typeof data[attrName] !== 'object') {
+                            data[attrName] = null;
+                        }
+                        break;
+                    default:
+                        if (typeof data[attrName] === 'undefined') { // TODO validate values
+                            data[attrName] = defaultValues[type];
+                        }
+                        break;
+                }
+            }
+
             Object
                 .keys(data)
                 .sort() // TODO fix sort so that some attributes have priority
@@ -951,25 +974,7 @@
                         return;
                     }
 
-                    switch (type) {
-                        case 'array-collection':
-                            if (!(data[dataAttrName] instanceof Array)) {
-                                data[dataAttrName] = [];
-                            }
-                            break;
-                        case 'object':
-                            if (typeof data[dataAttrName] !== 'object') {
-                                data[dataAttrName] = null;
-                            }
-                            break;
-                        case 'parent':
-                            break;
-                        default:
-                            if (typeof data[dataAttrName] === 'undefined') {
-                                data[dataAttrName] = defaultValues[model.attributes[attrName]._type];
-                            }
-                            break;
-                    }
+                    setToDefaultValues(data, model, attrName);
 
                     switch (type) {
                         case 'array-collection':
