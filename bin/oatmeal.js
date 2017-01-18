@@ -82,6 +82,271 @@
          */
         typePrefix = '@@';
 
+    function clone(data) {
+        var _clone = (function () {
+            var nativeMap;
+            try {
+                nativeMap = Map;
+            } catch (_) {
+                // maybe a reference error because no `Map`. Give it a dummy value that no
+                // value will ever be an instanceof.
+                nativeMap = function () {
+                };
+            }
+
+            var nativeSet;
+            try {
+                nativeSet = Set;
+            } catch (_) {
+                nativeSet = function () {
+                };
+            }
+
+            var nativePromise;
+            try {
+                nativePromise = Promise;
+            } catch (_) {
+                nativePromise = function () {
+                };
+            }
+
+            /**
+             * Clones (copies) an Object using deep copying.
+             *
+             * This function supports circular references by default, but if you are certain
+             * there are no circular references in your object, you can save some CPU time
+             * by calling clone(obj, false).
+             *
+             * Caution: if `circular` is false and `parent` contains circular references,
+             * your program may enter an infinite loop and crash.
+             *
+             * @param `parent` - the object to be cloned
+             * @param `circular` - set to true if the object to be cloned may contain
+             *    circular references. (optional - true by default)
+             * @param `depth` - set to a number if the object is only to be cloned to
+             *    a particular depth. (optional - defaults to Infinity)
+             * @param `prototype` - sets the prototype to be used when cloning an object.
+             *    (optional - defaults to parent prototype).
+             * @param `includeNonEnumerable` - set to true if the non-enumerable properties
+             *    should be cloned as well. Non-enumerable properties on the prototype
+             *    chain will be ignored. (optional - false by default)
+             */
+            function doClone(parent, circular, depth, prototype, includeNonEnumerable) {
+                if (typeof circular === 'object') {
+                    depth = circular.depth;
+                    prototype = circular.prototype;
+                    includeNonEnumerable = circular.includeNonEnumerable;
+                    circular = circular.circular;
+                }
+                // maintain two arrays for circular references, where corresponding parents
+                // and children have the same index
+                var allParents = [];
+                var allChildren = [];
+
+                var useBuffer = typeof Buffer != 'undefined';
+
+                if (typeof circular == 'undefined')
+                    circular = true;
+
+                if (typeof depth == 'undefined')
+                    depth = Infinity;
+
+                // recurse this function so we don't reset allParents and allChildren
+                function _clone(parent, depth) {
+                    // cloning null always returns null
+                    if (parent === null)
+                        return null;
+
+                    if (depth === 0)
+                        return parent;
+
+                    var child;
+                    var proto;
+                    if (typeof parent != 'object') {
+                        return parent;
+                    }
+
+                    if (parent instanceof nativeMap) {
+                        child = new nativeMap();
+                    } else if (parent instanceof nativeSet) {
+                        child = new nativeSet();
+                    } else if (parent instanceof nativePromise) {
+                        child = new nativePromise(function (resolve, reject) {
+                            parent.then(function (value) {
+                                resolve(_clone(value, depth - 1));
+                            }, function (err) {
+                                reject(_clone(err, depth - 1));
+                            });
+                        });
+                    } else if (doClone.__isArray(parent)) {
+                        child = [];
+                    } else if (doClone.__isRegExp(parent)) {
+                        child = new RegExp(parent.source, __getRegExpFlags(parent));
+                        if (parent.lastIndex) child.lastIndex = parent.lastIndex;
+                    } else if (doClone.__isDate(parent)) {
+                        child = new Date(parent.getTime());
+                    } else if (useBuffer && Buffer.isBuffer(parent)) {
+                        child = new Buffer(parent.length);
+                        parent.copy(child);
+                        return child;
+                    } else if (parent instanceof Error) {
+                        child = Object.create(parent);
+                    } else {
+                        if (typeof prototype == 'undefined') {
+                            proto = Object.getPrototypeOf(parent);
+                            child = Object.create(proto);
+                        }
+                        else {
+                            child = Object.create(prototype);
+                            proto = prototype;
+                        }
+                    }
+
+                    if (circular) {
+                        var index = allParents.indexOf(parent);
+
+                        if (index != -1) {
+                            return allChildren[index];
+                        }
+                        allParents.push(parent);
+                        allChildren.push(child);
+                    }
+
+                    if (parent instanceof nativeMap) {
+                        var keyIterator = parent.keys();
+                        while (true) {
+                            var next = keyIterator.next();
+                            if (next.done) {
+                                break;
+                            }
+                            var keyChild = _clone(next.value, depth - 1);
+                            var valueChild = _clone(parent.get(next.value), depth - 1);
+                            child.set(keyChild, valueChild);
+                        }
+                    }
+                    if (parent instanceof nativeSet) {
+                        var iterator = parent.keys();
+                        while (true) {
+                            var next = iterator.next();
+                            if (next.done) {
+                                break;
+                            }
+                            var entryChild = _clone(next.value, depth - 1);
+                            child.add(entryChild);
+                        }
+                    }
+
+                    for (var i in parent) {
+                        var attrs;
+                        if (proto) {
+                            attrs = Object.getOwnPropertyDescriptor(proto, i);
+                        }
+
+                        if (attrs && attrs.set == null) {
+                            continue;
+                        }
+                        child[i] = _clone(parent[i], depth - 1);
+                    }
+
+                    if (Object.getOwnPropertySymbols) {
+                        var symbols = Object.getOwnPropertySymbols(parent);
+                        for (var i = 0; i < symbols.length; i++) {
+                            // Don't need to worry about cloning a symbol because it is a primitive,
+                            // like a number or string.
+                            var symbol = symbols[i];
+                            var descriptor = Object.getOwnPropertyDescriptor(parent, symbol);
+                            if (descriptor && !descriptor.enumerable && !includeNonEnumerable) {
+                                continue;
+                            }
+                            child[symbol] = _clone(parent[symbol], depth - 1);
+                            if (!descriptor.enumerable) {
+                                Object.defineProperty(child, symbol, {
+                                    enumerable: false
+                                });
+                            }
+                        }
+                    }
+
+                    if (includeNonEnumerable) {
+                        var allPropertyNames = Object.getOwnPropertyNames(parent);
+                        for (var i = 0; i < allPropertyNames.length; i++) {
+                            var propertyName = allPropertyNames[i];
+                            var descriptor = Object.getOwnPropertyDescriptor(parent, propertyName);
+                            if (descriptor && descriptor.enumerable) {
+                                continue;
+                            }
+                            child[propertyName] = _clone(parent[propertyName], depth - 1);
+                            Object.defineProperty(child, propertyName, {
+                                enumerable: false
+                            });
+                        }
+                    }
+
+                    return child;
+                }
+
+                return _clone(parent, depth);
+            }
+
+            /**
+             * Simple flat clone using prototype, accepts only objects, usefull for property
+             * override on FLAT configuration object (no nested props).
+             *
+             * USE WITH CAUTION! This may not behave as you wish if you do not know how this
+             * works.
+             */
+            doClone.clonePrototype = function clonePrototype(parent) {
+                if (parent === null)
+                    return null;
+
+                var c = function () {
+                };
+                c.prototype = parent;
+                return new c();
+            };
+
+            // private utility functions
+
+            function __objToStr(o) {
+                return Object.prototype.toString.call(o);
+            }
+
+            doClone.__objToStr = __objToStr;
+
+            function __isDate(o) {
+                return typeof o === 'object' && __objToStr(o) === '[object Date]';
+            }
+
+            doClone.__isDate = __isDate;
+
+            function __isArray(o) {
+                return typeof o === 'object' && __objToStr(o) === '[object Array]';
+            }
+
+            doClone.__isArray = __isArray;
+
+            function __isRegExp(o) {
+                return typeof o === 'object' && __objToStr(o) === '[object RegExp]';
+            }
+
+            doClone.__isRegExp = __isRegExp;
+
+            function __getRegExpFlags(re) {
+                var flags = '';
+                if (re.global) flags += 'g';
+                if (re.ignoreCase) flags += 'i';
+                if (re.multiline) flags += 'm';
+                return flags;
+            }
+
+            doClone.__getRegExpFlags = __getRegExpFlags;
+
+            return doClone;
+        })();
+
+        return _clone(data)
+    }
+
     function isBoolean(booleanish) {
         return true;
     }
@@ -208,65 +473,6 @@
                     // http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
                 value.search(/(?:(?:\r\n)?[ \t])*(?:(?:(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*\<(?:(?:\r\n)?[ \t])*(?:@(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*(?:,@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*)*:(?:(?:\r\n)?[ \t])*)?(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*\>(?:(?:\r\n)?[ \t])*)|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*:(?:(?:\r\n)?[ \t])*(?:(?:(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*\<(?:(?:\r\n)?[ \t])*(?:@(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*(?:,@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*)*:(?:(?:\r\n)?[ \t])*)?(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*\>(?:(?:\r\n)?[ \t])*)(?:,\s*(?:(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*|(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)*\<(?:(?:\r\n)?[ \t])*(?:@(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*(?:,@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*)*:(?:(?:\r\n)?[ \t])*)?(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|"(?:[^\"\r\\]|\\.|(?:(?:\r\n)?[ \t]))*"(?:(?:\r\n)?[ \t])*))*@(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\] \000-\031]+(?:(?:(?:\r\n)?[ \t])+|\Z|(?=[\["()<>@,;:\\".\[\]]))|\[([^\[\]\r\\]|\\.)*\](?:(?:\r\n)?[ \t])*))*\>(?:(?:\r\n)?[ \t])*))*)?;\s*)/i) === 0
             );
-    }
-
-    // http://blog.soulserv.net/understanding-object-cloning-in-javascript-part-ii/
-    function clone(originalObject) {
-        // First create an empty object with
-        // same prototype of our original source
-
-        var propertyIndex,
-            descriptor,
-            keys,
-            current,
-            nextSource,
-            indexOf,
-            copies = [{
-                source: originalObject,
-                target: Object.create(Object.getPrototypeOf(originalObject))
-            }],
-            cloneObject = copies[0].target,
-            sourceReferences = [originalObject],
-            targetReferences = [cloneObject];
-
-        // First in, first out
-        while (current = copies.shift()) {
-            keys = Object.getOwnPropertyNames(current.source);
-
-            for (propertyIndex = 0; propertyIndex < keys.length; propertyIndex++) {
-                // Save the source's descriptor
-                descriptor = Object.getOwnPropertyDescriptor(current.source, keys[propertyIndex]);
-
-                if (!descriptor.value || typeof descriptor.value !== 'object' || descriptor.value instanceof Date) {
-                    // Added instanceof Date check
-                    Object.defineProperty(current.target, keys[propertyIndex], descriptor);
-                    continue;
-                }
-
-                nextSource = descriptor.value;
-                descriptor.value = Array.isArray(nextSource) ?
-                    [] :
-                    Object.create(Object.getPrototypeOf(nextSource));
-
-                indexOf = sourceReferences.indexOf(nextSource);
-
-                if (indexOf !== -1) {
-                    // The source is already referenced, just assign reference
-                    descriptor.value = targetReferences[indexOf];
-                    Object.defineProperty(current.target, keys[propertyIndex], descriptor);
-                    continue;
-                }
-
-                sourceReferences.push(nextSource);
-                targetReferences.push(descriptor.value);
-
-                Object.defineProperty(current.target, keys[propertyIndex], descriptor);
-
-                copies.push({ source: nextSource, target: descriptor.value });
-            }
-        }
-
-        return cloneObject;
     }
 
     function attachType(obj, type) {
@@ -604,16 +810,13 @@
 
     /**
      * Deserializes a value with a model.
-     * @param {*} data The data to deserialize.
+     * @param {*} rawData The data to deserialize.
      * @param {*} model The model of the data.
      * @returns {*} The deserialized data.
      */
-    self.deserialize = function deserialize(data, model) {
-        var loadedModels = {};
-
-        if (!isPrimitive(data)) {
-            data = clone(data);
-        }
+    self.deserialize = function deserialize(rawData, model) {
+        var loadedModels = {},
+            data = !isPrimitive(rawData) ? clone(rawData) : rawData;
 
         /**
          *
@@ -760,10 +963,9 @@
                             }
                             break;
                         case 'parent':
-                            data[dataAttrName] = null;
                             break;
                         default:
-                            if (typeof data[dataAttrName] !== 'undefined') {
+                            if (typeof data[dataAttrName] === 'undefined') {
                                 data[dataAttrName] = defaultValues[model.attributes[attrName]._type];
                             }
                             break;
