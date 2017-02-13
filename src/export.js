@@ -4,7 +4,7 @@
     };
 
     if (typeof define === 'function' && define.amd) {
-        define(dependencies, function (moment) {
+        define(dependencies, function () {
             return new Oatmeal(
                 Array.prototype.slice.call(arguments)
             );
