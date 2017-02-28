@@ -4,7 +4,7 @@
     };
 
     if (typeof define === 'function' && define.amd) {
-        define(dependencies, function (moment) {
+        define(dependencies, function () {
             return new Oatmeal(
                 Array.prototype.slice.call(arguments)
             );
@@ -598,12 +598,17 @@
      * Serializes a value with a model.
      * @param {*} data The data to serialize.
      * @param {*} model The model of the data.
+     * @param {*} options The options.
      * @returns {*} The serialized data.
      */
-    self.serialize = function serialize(data, model) {
-        var parents = [];
-        var loadedData = {};
-        var loadedModels = {};
+    self.serialize = function serialize(data, model, options) {
+        var parents = [],
+            loadedData = {},
+            loadedModels = {},
+            depth;
+
+        options = options || {};
+        depth = options.depth;
 
         if (!isPrimitive(data)) {
             data = clone(data);
@@ -726,11 +731,16 @@
          *
          * @param data
          * @param model
+         * @param level
          * @returns {*}
          */
-        function serializeObject(data, model) {
+        function serializeObject(data, model, level) {
             if (data === null || typeof data === 'undefined') {
                 return null;
+            }
+
+            if (isNaN(level) || level === null) {
+                level = 0;
             }
 
             model = determineModel(model);
@@ -790,7 +800,7 @@
                             });
                             break;
                         case 'object':
-                            data[dataAttrName] = serializeObject(data[attrName], model.attributes[attrName]._model);
+                            data[dataAttrName] = !isNaN(depth) && level === depth ? serializeObject(data[attrName], model.attributes[attrName]._model, level + 1) : null;
                             break;
                         case 'parent':
                             data[dataAttrName] = serializeParent(data, attrName, model.attributes[attrName]._model);
@@ -812,9 +822,10 @@
      * Deserializes a value with a model.
      * @param {*} rawData The data to deserialize.
      * @param {*} model The model of the data.
+     * @param {*} options The options.
      * @returns {*} The deserialized data.
      */
-    self.deserialize = function deserialize(rawData, model) {
+    self.deserialize = function deserialize(rawData, model, options) {
         var loadedModels = {},
             data = !isPrimitive(rawData) ? clone(rawData) : rawData;
 
