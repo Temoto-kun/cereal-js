@@ -800,7 +800,7 @@
                             });
                             break;
                         case 'object':
-                            data[dataAttrName] = !isNaN(depth) && level === depth ? serializeObject(data[attrName], model.attributes[attrName]._model, level + 1) : null;
+                            data[dataAttrName] = !isNaN(depth) && level <= depth ? serializeObject(data[attrName], model.attributes[attrName]._model, level + 1) : null;
                             break;
                         case 'parent':
                             data[dataAttrName] = serializeParent(data, attrName, model.attributes[attrName]._model);
