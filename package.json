@@ -1,6 +1,6 @@
 {
   "name": "@theoryofnekomata/oatmeal",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "De/serializes JavaScript models for use in REST APIs.",
   "main": "bin/oatmeal.js",
   "scripts": {
